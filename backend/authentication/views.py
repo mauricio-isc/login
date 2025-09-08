@@ -11,15 +11,18 @@ api_view(['POST'])
 def login_view(request):
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():
-        user = serializer.validate_data['user']
-        login(request, user)
-        return Response(UserSerializer(user).data)
+        data = serializer.validate_data
+        return Response({
+            'user': UserSerializer(data['user']).data,
+            'refresh': data['refresh'],
+            'access': data['access']
+        })
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    logout(request)
+    #Con JWT, el logout se maneja en el cliente descartando el token
     return Response({"message": "Sesion cerrada correctamente"})
 
 @api_view(['GET'])
