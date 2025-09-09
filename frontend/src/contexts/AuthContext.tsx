@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, LoginCredentials } from '../types';
-import { authAPI } from '../services/api';
+import { User, LoginCredentials, RegisterCredentials } from '@/types';
+import { authAPI } from '@/services/api';
 
 interface AuthContextType {
   user: User | null;
   login: (credentials: LoginCredentials) => Promise<void>;
+  register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -65,6 +66,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const register = async (credentials: RegisterCredentials) => {
+    try{
+      const response = await authAPI.register(credentials);
+      const { user, access, refresh } = response;
+
+      localStorage.setItem('accessToken', access);
+      localStorage.setItem('refreshToken', refresh);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      setUser(user);
+    }catch(error){
+      throw error;
+    }
+  };
+
+
   const logout = async () => {
     try {
       await authAPI.logout();
@@ -81,6 +98,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value = {
     user,
     login,
+    register,
     logout,
     isLoading,
   };
