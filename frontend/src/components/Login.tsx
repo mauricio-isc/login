@@ -1,41 +1,40 @@
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext'
-import { LoginCredentials } from '@/types';
+import { useAuth } from '../contexts/AuthContext';
+import { LoginCredentials } from '../types';
 
 const Login: React.FC = () => {
-    const [credentials, setCredentials] = useState<LoginCredentials>({
-        username: '',
-        password: ''
-    })
+  const [credentials, setCredentials] = useState<LoginCredentials>({
+    username: '',
+    password: ''
+  });
+  const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  const { login } = useAuth();
 
-    const [error, setError] = useState<string>('');
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      await login(credentials);
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Error al iniciar sesión');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const { login } = useAuth();
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCredentials({
+      ...credentials,
+      [e.target.name]: e.target.value
+    });
+  };
 
-    const handleSubmit = async (e: React.FormEvent)=>{
-        e.preventDefault();
-        setIsLoading(true);
-        setError('');
-
-        try{
-            await login(credentials);
-        }catch(err: any){
-            setError(err.response?.data?.detail || 'Error al iniciar sesion');
-        }finally{
-            setIsLoading(false);
-        }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>{
-        setCredentials({
-            ...credentials,
-            [e.target.name]: e.target.value
-        });
-    };
-
-    return(
-<div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
+  return (
+    <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
       <h2>Iniciar Sesión</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
@@ -82,5 +81,4 @@ const Login: React.FC = () => {
   );
 };
 
-    
 export default Login;

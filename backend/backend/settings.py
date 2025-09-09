@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os 
 from pathlib import Path
 from datetime import timedelta
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-b+*q8t3x=wach%&gxa_v@*!bd7^x+ys0^q=idy#b8uw&0o=qgn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 
 # Application definition
@@ -44,7 +45,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Debe estar lo más arriba posible
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,13 +79,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-#POSTGRESQL
+# POSTGRESQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'login_db',
         'USER': 'postgres',
-        'PASSWORD':'developer',
+        'PASSWORD': 'developer',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -132,31 +133,70 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#Configuracion de REST framework
+# Configuración de REST framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',  # Cambiado a AllowAny para login
     ]
 }
 
-#Configuracion de JWT
+# Configuración de JWT
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-
-#Configuracion de cors
+# Configuración de CORS
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # URL de React
+    "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
+# Configuración importante para CSRF con React
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+# Configuración de cookies para desarrollo
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_HTTPONLY = True
+
+# Para evitar problemas con SameSite cookies
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# Configuración para deshabilitar CSRF en APIs (Middleware)
+class DisableCSRFMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Deshabilitar CSRF para todas las rutas API
+        if request.path.startswith('/api/'):
+            setattr(request, '_dont_enforce_csrf_checks', True)
+        response = self.get_response(request)
+        return response
+
+# Agregar el middleware al inicio
+MIDDLEWARE = [
+    'backend.settings.DisableCSRFMiddleware',
+] + MIDDLEWARE
+
+# Modelo de usuario personalizado
 AUTH_USER_MODEL = 'authentication.CustomUser'
+
+# Configuración adicional para evitar problemas de autenticación
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'access-token'
+JWT_AUTH_REFRESH_COOKIE = 'refresh-token'

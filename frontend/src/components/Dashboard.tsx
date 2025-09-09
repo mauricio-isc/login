@@ -1,15 +1,14 @@
-import react from 'react';
+import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
-
 const Dashboard: React.FC = () => {
-    const { user, logout } = useAuth();
+  const { user, logout } = useAuth();
 
-    const handleLogout = () => {
-        logout();
-    };
+  const handleLogout = () => {
+    logout();
+  };
 
-    return (
+  return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
       <h2>Bienvenido, {user?.username}!</h2>
       <div style={{ marginBottom: '20px' }}>
@@ -26,6 +25,6 @@ const Dashboard: React.FC = () => {
       </button>
     </div>
   );
-}
+};
 
 export default Dashboard;

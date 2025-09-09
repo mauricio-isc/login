@@ -2,28 +2,51 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.contrib.auth import login, logout
-from .serializers import UserSerializer, LoginSerializer
-# Create your views here.
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import update_last_login
+from .serializers import UserSerializer
 
-api_view(['POST'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
-    serializer = LoginSerializer(data=request.data)
-    if serializer.is_valid():
-        data = serializer.validate_data
-        return Response({
-            'user': UserSerializer(data['user']).data,
-            'refresh': data['refresh'],
-            'access': data['access']
-        })
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    username = request.data.get('username')
+    password = request.data.get('password')
+    
+    if not username or not password:
+        return Response(
+            {'error': 'Username and password required'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    user = authenticate(username=username, password=password)
+    
+    if user is not None:
+        if user.is_active:
+            refresh = RefreshToken.for_user(user)
+            update_last_login(None, user)
+            
+            return Response({
+                'user': UserSerializer(user).data,
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            })
+        else:
+            return Response(
+                {'error': 'Usuario desactivado'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    else:
+        return Response(
+            {'error': 'Credenciales inválidas'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    #Con JWT, el logout se maneja en el cliente descartando el token
-    return Response({"message": "Sesion cerrada correctamente"})
+    # Con JWT, el logout se maneja en el cliente descartando el token
+    return Response({"message": "Sesión cerrada correctamente"})
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
