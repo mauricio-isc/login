@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AuthResponse, LoginCredentials, User } from '@/types';
+import { AuthResponse, LoginCredentials, RegisterCredentials, User } from '@/types';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -60,6 +60,11 @@ api.interceptors.response.use(
 export const authAPI = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const response = await api.post('/auth/login/', credentials);
+    return response.data;
+  },
+
+  register: async (credentials: RegisterCredentials): Promise<AuthResponse> => {
+    const response = await api.post('/auth/register/', credentials);
     return response.data;
   },
 
