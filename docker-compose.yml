@@ -1,0 +1,53 @@
+version: '3.8'
+
+
+services:
+  # Base de datos PostgreSQL
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_DB: login_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: developer
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  # Backend Django
+  backend:
+    build: ./backend
+    command: >
+      sh -c "/wait-for-it.sh db:5432 -- 
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:developer@db:5432/login_db
+      - DEBUG=1
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # Frontend React
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
