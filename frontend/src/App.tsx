@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import Login from '@/components/Login';
+import Register from '@/components/Register';
 import Dashboard from '@/components/dashboard';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import '@/App.css';
@@ -15,6 +16,12 @@ const AppContent: React.FC = () => {
         path="/login" 
         element={user ? <Navigate to="/dashboard" replace /> : <Login />} 
       />
+
+      <Route 
+        path="/register"
+        element={user ? <Navigate to="/dashboard" replace /> : <Register />}
+      />
+
       <Route 
         path="/dashboard" 
         element={
