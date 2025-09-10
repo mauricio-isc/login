@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginCredentials } from '../types';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import '../styles/FormalForm.css';
 
 const Login: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
@@ -12,6 +13,7 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,8 +22,9 @@ const Login: React.FC = () => {
     
     try {
       await login(credentials);
+      navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Error al iniciar sesión');
+      setError(err.response?.data?.error || 'Error al iniciar sesión. Verifique sus credenciales.');
     } finally {
       setIsLoading(false);
     }
@@ -35,56 +38,66 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
-      <h2>Iniciar Sesión</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="username">Usuario:</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={credentials.username}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
+    <div className="formal-container">
+      <div className="formal-form-wrapper">
+        <div className="formal-form-header">
+          <h2>Iniciar Sesión</h2>
+          <p>Ingrese a su cuenta para acceder al sistema</p>
         </div>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="password">Contraseña:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={credentials.password}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
-        </div>
-        {error && <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
-        <button 
-          type="submit" 
-          disabled={isLoading}
-          style={{ 
-            width: '100%', 
-            padding: '10px', 
-            backgroundColor: '#4CAF50', 
-            color: 'white', 
-            border: 'none',
-            opacity: isLoading ? 0.7 : 1 
-          }}
-        >
-          {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-        </button>
+        
+        <div className="formal-form-body">
+          <form onSubmit={handleSubmit}>
+            <div className="formal-form-group">
+              <label htmlFor="username">Nombre de Usuario</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={credentials.username}
+                onChange={handleChange}
+                required
+                className="formal-form-input"
+                placeholder="Ingrese su nombre de usuario"
+              />
+            </div>
 
-        <div style={{ textAlign: 'center', marginTop: '15px' }}>
-          <span>¿No tienes una cuenta?</span>
-          <Link to="/register" style={{ color: '#4CAF50' }}>
-            Registrate aqui
-          </Link>
+            <div className="formal-form-group">
+              <label htmlFor="password">Contraseña</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={credentials.password}
+                onChange={handleChange}
+                required
+                className="formal-form-input"
+                placeholder="Ingrese su contraseña"
+              />
+            </div>
+
+            {error && (
+              <div className="formal-form-error" style={{textAlign: 'center', marginBottom: '15px'}}>
+                {error}
+              </div>
+            )}
+            
+            <button 
+              type="submit" 
+              disabled={isLoading}
+              className="formal-form-button"
+            >
+              {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            </button>
+
+            <div className="formal-form-footer">
+              ¿No tiene una cuenta?{' '}
+              <Link to="/register" className="formal-form-link">
+                Regístrese aquí
+              </Link>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
