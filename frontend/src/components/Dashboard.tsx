@@ -1,5 +1,6 @@
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
+import '../styles/Dashboard.css';
 
 const Dashboard: React.FC = () => {
   const { user, logout } = useAuth();
@@ -9,20 +10,44 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-      <h2>Bienvenido, {user?.username}!</h2>
-      <div style={{ marginBottom: '20px' }}>
-        <h3>Información del usuario:</h3>
-        <p><strong>Usuario:</strong> {user?.username}</p>
-        <p><strong>Email:</strong> {user?.email}</p>
-        <p><strong>Teléfono:</strong> {user?.phone || 'No proporcionado'}</p>
+    <div className="dashboard-container">
+      <div className="dashboard-card">
+        <div className="dashboard-header">
+          <h2>Panel de Control</h2>
+        </div>
+        
+        <div className="dashboard-body">
+          <div className="user-info">
+            <h3>Información del Usuario</h3>
+            
+            <div className="info-item">
+              <span className="info-label">Usuario:</span>
+              <span className="info-value">{user?.username}</span>
+            </div>
+            
+            <div className="info-item">
+              <span className="info-label">Email:</span>
+              <span className="info-value">{user?.email}</span>
+            </div>
+            
+            <div className="info-item">
+              <span className="info-label">Teléfono:</span>
+              <span className="info-value">{user?.phone || 'No proporcionado'}</span>
+            </div>
+            
+            <div className="info-item">
+              <span className="info-label">ID de usuario:</span>
+              <span className="info-value">{user?.id}</span>
+            </div>
+          </div>
+          
+          <div className="dashboard-actions">
+            <button onClick={handleLogout} className="logout-button">
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
       </div>
-      <button 
-        onClick={handleLogout}
-        style={{ padding: '10px 20px', backgroundColor: '#f44336', color: 'white', border: 'none' }}
-      >
-        Cerrar Sesión
-      </button>
     </div>
   );
 };

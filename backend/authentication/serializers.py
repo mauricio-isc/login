@@ -4,6 +4,12 @@ from django.contrib.auth.password_validation import validate_password
 
 User = get_user_model()
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'phone')
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
@@ -23,11 +29,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password": "las contrasenas no coinciden"})
         # Verificar si el usuario ya existe
-        if User.objets.filter(username=attrs['username']).exists():
+        if User.objects.filter(username=attrs['username']).exists():
             raise serializers.ValidationError({"username": "Este nombre de usuario ya esta en uso"})
         
         #Verificar si el email ya existe
-        if User.objets.filter(email=attrs['email'].exists()):
+        if User.objects.filter(email=attrs['email']).exists():
             raise serializers.ValidationError({"email": "Este email ya se encuentra en uso"})
         
         return attrs
@@ -39,7 +45,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password'],
-            phone= validated_data.get['phone', '']
+            phone= validated_data.get('phone', '')
         )
 
         return user
