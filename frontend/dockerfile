@@ -1,0 +1,24 @@
+#Etapa de construccion
+FROM node:18-alpine as build
+
+WORKDIR /app
+
+#copiar package.json e instalar dependencia
+COPY package.json package-lock.json ./
+RUN npm ci --silent
+
+#Copiar el codigo fuente y construir
+COPY . . 
+RUN npm run build
+
+#Etapa de produccion
+FROM nginx:alpine
+
+#copiar la configuracion de construccion
+COPY --from=build /app/build /usr/share/nginx/html
+
+#Exponer puerto
+EXPOSE 80
+
+#comando para ejecutar nginx
+CMD [ "nginx", "-g", "daemon off;"]
