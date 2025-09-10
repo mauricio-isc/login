@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-b+*q8t3x=wach%&gxa_v@*!bd7^x+ys0^q=idy#b8uw&0o=qgn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'backend']
 
 
 # Application definition
@@ -83,13 +83,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'login_db',
-        'USER': 'postgres',
-        'PASSWORD': 'developer',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('POSTGRES_DB', 'login_db'),
+        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'developer'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),  # 'db' es el nombre del servicio en Docker
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
+
 
 
 # Password validation
@@ -156,6 +157,7 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://frontend:80",   #Comunicacion entre contenedores
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -164,6 +166,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://frontend:80",
 ]
 
 # Configuración de cookies para desarrollo
