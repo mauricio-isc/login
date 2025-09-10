@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginCredentials } from '../types';
+import { Link } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
@@ -76,6 +77,13 @@ const Login: React.FC = () => {
         >
           {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </button>
+
+        <div style={{ textAlign: 'center', marginTop: '15px' }}>
+          <span>¿No tienes una cuenta?</span>
+          <Link to="/register" style={{ color: '#4CAF50' }}>
+            Registrate aqui
+          </Link>
+        </div>
       </form>
     </div>
   );
