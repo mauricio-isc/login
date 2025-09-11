@@ -1,5 +1,4 @@
-1. Crea el archivo README.md en la raíz del proyecto
-markdown
+
 # 🚀 Django + React + PostgreSQL Login System
 
 ![Django](https://img.shields.io/badge/Django-5.2.5-green.svg)
