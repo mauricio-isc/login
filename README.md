@@ -183,3 +183,18 @@ Commit tus cambios (git commit -m 'Add some AmazingFeature')
 Push a la rama (git push origin feature/AmazingFeature)
 
 Abre un Pull Request
+
+📄 Licencia
+Este proyecto está bajo la Licencia MIT. Ver el archivo LICENSE para más detalles.
+
+👨‍💻 Autor
+Mauricio Sanchez Nava - mauricioisc
+
+🙌 Agradecimientos
+Django
+
+React
+
+Docker
+
+PostgreSQL
